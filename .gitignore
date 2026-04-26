@@ -1,0 +1,21 @@
+# venv / build
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Runtime user state (każdy user ma swoje)
+mappings.json
+outputs.json
+
+# Yamaha manual (copyright)
+fgdp50_en_ug_a0.pdf
