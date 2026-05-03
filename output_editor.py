@@ -3,6 +3,7 @@
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
+    QComboBox,
     QFormLayout,
     QFrame,
     QHBoxLayout,
@@ -74,6 +75,12 @@ class OutputEditor(QFrame):
         note_row.addWidget(self.note_name_label, 1)
         form.addRow("Note", note_row)
 
+        self.velocity_mode_combo = QComboBox()
+        self.velocity_mode_combo.addItem("Fixed", "fixed")
+        self.velocity_mode_combo.addItem("Passthrough (HW)", "passthrough")
+        self.velocity_mode_combo.currentIndexChanged.connect(self._on_velocity_mode)
+        form.addRow("Vel mode", self.velocity_mode_combo)
+
         self.velocity_spin = QSpinBox()
         self.velocity_spin.setRange(1, 127)
         self.velocity_spin.valueChanged.connect(self._on_velocity)
@@ -106,6 +113,8 @@ class OutputEditor(QFrame):
                 self.note_spin.setValue(60)
                 self.note_name_label.setText("—")
                 self.velocity_spin.setValue(100)
+                self.velocity_mode_combo.setCurrentIndex(0)
+                self.velocity_spin.setEnabled(True)
                 self.setEnabled(False)
                 return
             self.setEnabled(True)
@@ -116,6 +125,10 @@ class OutputEditor(QFrame):
             self.note_spin.setValue(int(cell.note))
             self.note_name_label.setText(note_name(int(cell.note)))
             self.velocity_spin.setValue(int(cell.velocity))
+            mode = getattr(cell, "velocity_mode", "fixed")
+            idx = self.velocity_mode_combo.findData(mode)
+            self.velocity_mode_combo.setCurrentIndex(idx if idx >= 0 else 0)
+            self.velocity_spin.setEnabled(mode != "passthrough")
         finally:
             self._block = False
 
@@ -141,6 +154,11 @@ class OutputEditor(QFrame):
 
     def _on_velocity(self, v: int):
         self._emit("velocity", int(v))
+
+    def _on_velocity_mode(self, _idx: int):
+        mode = self.velocity_mode_combo.currentData() or "fixed"
+        self.velocity_spin.setEnabled(mode != "passthrough")
+        self._emit("velocity_mode", str(mode))
 
     def _on_unroute(self):
         if self._out_id:

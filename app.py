@@ -472,7 +472,7 @@ class MainWindow(QMainWindow):
             return
         self._trigger_pad(pad_id, on=False, source="GUI")
 
-    def _trigger_pad(self, pad_id: str, on: bool, source: str):
+    def _trigger_pad(self, pad_id: str, on: bool, source: str, hw_velocity: int | None = None):
         out_id = self.bank.get_route(pad_id)
         if not out_id:
             if source == "GUI" and on:
@@ -485,13 +485,18 @@ class MainWindow(QMainWindow):
         if cell_item is not None:
             cell_item.set_lit(on)
         if cell.enabled:
-            self._send_voice(cell, on, tag=f"{pad_id}->{out_id}", logged=(source == "GUI"))
+            self._send_voice(cell, on, tag=f"{pad_id}->{out_id}", logged=(source == "GUI"), hw_velocity=hw_velocity)
         elif on and source == "GUI":
             self.log_line(f"-- {out_id} disabled, no MIDI")
 
-    def _send_voice(self, cell, on: bool, tag: str, logged: bool):
+    def _send_voice(self, cell, on: bool, tag: str, logged: bool, hw_velocity: int | None = None):
         kind = "note_on" if on else "note_off"
-        vel = cell.velocity if on else 0
+        if not on:
+            vel = 0
+        elif getattr(cell, "velocity_mode", "fixed") == "passthrough" and hw_velocity is not None:
+            vel = max(1, min(127, int(hw_velocity)))
+        else:
+            vel = cell.velocity
         msg = mido.Message(kind, channel=cell.channel, note=cell.note, velocity=vel)
         self.midi.send(msg)
         if logged:
@@ -535,7 +540,7 @@ class MainWindow(QMainWindow):
             item = self.pad_view.items_by_id.get(pad_id)
             if item is not None:
                 item.set_midi(True)
-            self._trigger_pad(pad_id, on=True, source="HW")
+            self._trigger_pad(pad_id, on=True, source="HW", hw_velocity=msg.velocity)
         elif msg.type == "note_off" or (msg.type == "note_on" and msg.velocity == 0):
             pad_id = self.mapping.find_pad(msg.channel, msg.note)
             if not pad_id:

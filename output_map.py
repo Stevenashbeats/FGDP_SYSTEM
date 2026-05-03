@@ -23,7 +23,8 @@ STORE_PATH = Path(__file__).parent / "outputs.json"
 class OutputCell:
     channel: int = 0           # 0..15  (UI pokaże +1)
     note: int = 60             # 0..127
-    velocity: int = 100        # 1..127
+    velocity: int = 100        # 1..127  (używane gdy velocity_mode == "fixed")
+    velocity_mode: str = "fixed"   # "fixed" | "passthrough"
     enabled: bool = True
     source_pad: str | None = None  # routing source (FGDP pad/key id)
 
