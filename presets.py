@@ -6,8 +6,9 @@ from pathlib import Path
 
 from mappings import MappingStore
 from output_map import OutputBank, OutputCell
+from paths import seed_user_dir_from_bundle
 
-PRESETS_DIR = Path(__file__).parent / "presets"
+PRESETS_DIR = seed_user_dir_from_bundle("presets")
 
 
 def list_presets() -> list[dict]:

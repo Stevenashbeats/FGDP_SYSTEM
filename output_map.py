@@ -10,13 +10,15 @@ import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from paths import seed_user_file_from_bundle
+
 GRID_COLS = 4
 GRID_ROWS = 4
 GRID_SIZE = GRID_COLS * GRID_ROWS  # 16
 
 OUTPUT_IDS: tuple[str, ...] = tuple(f"out-{i:02d}" for i in range(1, GRID_SIZE + 1))
 
-STORE_PATH = Path(__file__).parent / "outputs.json"
+STORE_PATH = seed_user_file_from_bundle("outputs.json")
 
 
 @dataclass

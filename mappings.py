@@ -14,8 +14,10 @@ lokalne korekty bez ruszania kodu. Brak pliku = czyste defaulty.
 import json
 from pathlib import Path
 
+from paths import seed_user_file_from_bundle
+
 DEFAULT_VELOCITY = 100
-STORE_PATH = Path(__file__).parent / "mappings.json"
+STORE_PATH = seed_user_file_from_bundle("mappings.json")
 
 ALL_IDS: tuple[str, ...] = tuple(
     [f"pad-{i:02d}" for i in range(1, 19)] + [f"key-{i:02d}" for i in range(1, 9)]

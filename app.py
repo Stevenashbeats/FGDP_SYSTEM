@@ -46,9 +46,10 @@ from output_editor import OutputEditor, note_name
 from output_map import OutputBank
 from output_view import OutputView
 from pad_view import PadView
+from paths import bundle_dir
 from presets import list_presets, load_preset, save_preset
 
-SVG_PATH = Path(__file__).parent / "PADS DESIGN_01.svg"
+SVG_PATH = bundle_dir() / "PADS DESIGN_01.svg"
 
 STYLE = """
 QMainWindow, QWidget { background: #121212; color: #e5e5e5; }
